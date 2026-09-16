@@ -66,9 +66,11 @@ h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:12px;font-si
 </div>
 
 <div class="room">
-<div class="area" style="left:20px;top:260px;width:190px;height:190px;">柜子</div>
-<div class="area" style="left:140px;top:620px;width:190px;height:95px;">答疑</div>
-<div class="area" style="left:285px;top:620px;width:190px;height:95px;">书架</div>
+<!-- 柜子宽度改为 193px（两个座位宽：95 + 98） -->
+<div class="area" style="left:20px;top:260px;width:193px;height:193px;">柜子</div>
+<!-- 答疑和书架宽度均改为 193px，位置依次排开 -->
+<div class="area" style="left:20px;top:620px;width:193px;height:95px;">答疑</div>
+<div class="area" style="left:223px;top:620px;width:193px;height:95px;">书架</div>
 <div id="seats"></div>
 </div>
 
@@ -78,25 +80,25 @@ const colLeft = (colIndex) => 20 + colIndex * 98;
 
 for(let i=0; i<12; i++) pos.push([colLeft(i), 20]);
 for(let i=0; i<4; i++) pos.push([colLeft(7 + i), 250]);
-for(let i=0; i<4; i++) pos.push([colLeft(7 + i), 375]);
+for(let i=0; i<4; i++) pos.push([colLeft(7 + i), 348]);
 for(let i=0; i<5; i++) pos.push([colLeft(7 + i), 620]);
 
 let data = [];
 const seats = document.getElementById("seats");
 
-//  data.json
+// 异步加载 data.json
 function loadData() {
   fetch('data.json')
     .then(res => res.json())
     .then(json => {
       data = json;
       render();
-      document.getElementById("tip-msg").innerText = "已成功加载座位数据。";
+      document.getElementById("tip-msg").innerText = "状态：已成功从 data.json 加载座位数据。";
       document.getElementById("tip-msg").style.color = "green";
     })
     .catch(err => {
       console.error(err);
-      document.getElementById("tip-msg").innerText = "暂时无法读取座位数据。";
+      document.getElementById("tip-msg").innerText = "提示：无法读取 data.json（请确保通过本地服务器环境打开）。";
       document.getElementById("tip-msg").style.color = "red";
     });
 }
