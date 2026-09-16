@@ -5,14 +5,14 @@
 <title>行知学堂座位管理系统</title>
 <style>
 body{margin:0;background:#eef2f7;font-family:"Microsoft YaHei",Arial}
-h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:12px;font-size: 20px;}
+h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:10px;font-size: 18px;}
 
 .control-bar {
-  width: 1220px;
-  margin: 10px auto;
+  width: 1160px;
+  margin: 8px auto;
   background: #fff;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 8px 15px;
+  border-radius: 6px;
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;
@@ -30,7 +30,8 @@ h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:12px;font-si
 }
 .control-bar button:hover { opacity: 0.9; }
 
-.room{position:relative;width:1220px;height:792px;margin:10px auto;background:#fff;border:2px solid #333;border-radius:8px;box-sizing: border-box;}
+/* 针对 A4 横向优化的画布容器尺寸 */
+.room{position:relative;width:1160px;height:780px;margin:8px auto;background:#fff;border:2px solid #333;border-radius:8px;box-sizing: border-box;}
 .seat,.area{position:absolute;border:2px solid #333;border-radius:6px;display:flex;align-items:center;justify-content:center}
 
 .seat{width:95px;height:95px;background:#fafafa;flex-direction:column;font-size:14px;font-weight:bold;line-height:1.3;overflow:hidden;box-sizing: border-box;padding: 4px;}
@@ -45,11 +46,21 @@ h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:12px;font-si
 
 .area{background:#f3f3f3;font-weight:bold;box-sizing: border-box;font-size: 15px;}
 
+/* 极佳的 A4 打印与 PDF 导出适配 */
 @media print {
-  @page { size: A4 landscape; margin: 0; }
+  @page { 
+    size: A4 landscape; 
+    margin: 5mm; /* 减少打印机默认边距，让内容最大化铺满 */
+  }
   body { background: #fff; margin: 0; }
   h1, .control-bar { display: none !important; }
-  .room { margin: 0 auto; border: none; width: 1220px; height: 792px; }
+  .room { 
+    margin: 0 auto; 
+    border: 2px solid #333 !important; 
+    width: 1140px !important; 
+    height: 770px !important; 
+    page-break-inside: avoid;
+  }
 }
 </style>
 </head>
@@ -66,9 +77,9 @@ h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:12px;font-si
 </div>
 
 <div class="room">
-<!-- 柜子宽度改为 193px（两个座位宽：95 + 98） -->
-<div class="area" style="left:20px;top:260px;width:193px;height:193px;">柜子</div>
-<!-- 答疑和书架宽度均改为 193px，位置依次排开 -->
+<!-- 柜子宽度 193px -->
+<div class="area" style="left:20px;top:250px;width:193px;height:95px;">柜子</div>
+<!-- 答疑和书架宽度 193px -->
 <div class="area" style="left:20px;top:620px;width:193px;height:95px;">答疑</div>
 <div class="area" style="left:223px;top:620px;width:193px;height:95px;">书架</div>
 <div id="seats"></div>
@@ -78,15 +89,21 @@ h1{text-align:center;background:#2d6cdf;color:#fff;margin:0;padding:12px;font-si
 const pos=[];
 const colLeft = (colIndex) => 20 + colIndex * 98;
 
+// 1. 第一排：12个座位 (列 0 ~ 11) -> y = 20
 for(let i=0; i<12; i++) pos.push([colLeft(i), 20]);
+
+// 2. 中间第一组：4个座位 (列 7 到 10) -> y = 250
 for(let i=0; i<4; i++) pos.push([colLeft(7 + i), 250]);
+
+// 3. 中间第二组：4个座位 (列 7 到 10) -> y = 348 (紧贴上一行)
 for(let i=0; i<4; i++) pos.push([colLeft(7 + i), 348]);
+
+// 4. 底部一行：5个座位 (列 7 到 11) -> y = 620
 for(let i=0; i<5; i++) pos.push([colLeft(7 + i), 620]);
 
 let data = [];
 const seats = document.getElementById("seats");
 
-// 异步加载 data.json
 function loadData() {
   fetch('data.json')
     .then(res => res.json())
